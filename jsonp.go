@@ -1,22 +1,24 @@
 package ginjsonp
 
 import (
-	"bytes"
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"gopkg.in/gin-gonic/gin.v1"
 )
 
 const (
-	noWritten	= -1
-	defaultStatus	= 200
+	noWritten     = -1
+	defaultStatus = 200
 )
 
+// Handler wraps responses in JSONP function
 func Handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		callback := c.DefaultQuery("callback", "")
@@ -29,14 +31,13 @@ func Handler() gin.HandlerFunc {
 		}
 		var wb *responseBuffer
 		if w, ok := c.Writer.(gin.ResponseWriter); ok {
-			wb = NewResponseBuffer(w)
+			wb = newResponseBuffer(w)
 			c.Writer = wb
 			c.Next()
-		}else {
+		} else {
 			c.Next()
 			return
 		}
-		
 
 		if strings.Index(wb.Header().Get("Content-Type"), "/json") >= 0 {
 			status := wb.status
@@ -74,6 +75,7 @@ type jsonpResponse struct {
 	Data interface{}
 }
 
+// MarshalJSON marshals the entire response, with headers
 func (j *jsonpResponse) MarshalJSON() ([]byte, error) {
 	meta, err := json.Marshal(j.Meta)
 	if err != nil {
@@ -85,12 +87,12 @@ func (j *jsonpResponse) MarshalJSON() ([]byte, error) {
 
 type responseBuffer struct {
 	Response gin.ResponseWriter // the actual ResponseWriter to flush to
-	status   int                 // the HTTP response code from WriteHeader
-	Body     *bytes.Buffer       // the response content body
+	status   int                // the HTTP response code from WriteHeader
+	Body     *bytes.Buffer      // the response content body
 	Flushed  bool
 }
 
-func NewResponseBuffer(w gin.ResponseWriter) *responseBuffer {
+func newResponseBuffer(w gin.ResponseWriter) *responseBuffer {
 	return &responseBuffer{
 		Response: w, status: defaultStatus, Body: &bytes.Buffer{},
 	}
@@ -109,7 +111,7 @@ func (w *responseBuffer) WriteString(s string) (n int, err error) {
 	//w.WriteHeaderNow()
 	//n, err = io.WriteString(w.ResponseWriter, s)
 	//w.size += n
-        n, err = w.Write([]byte(s))
+	n, err = w.Write([]byte(s))
 	return
 }
 
