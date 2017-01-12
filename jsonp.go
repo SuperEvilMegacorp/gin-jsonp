@@ -1,4 +1,4 @@
-package ginjsonp
+package jsonp
 
 import (
 	"bufio"

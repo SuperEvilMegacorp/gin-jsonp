@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	jsonp "github.com/jim3ma/gin-jsonp"
+	jsonp "github.com/madglory/gin-jsonp"
+	"gopkg.in/gin-gonic/gin.v1"
 )
 
 func main() {
@@ -13,7 +13,7 @@ func main() {
 	r.Use(jsonp.Handler())
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-		"message": "pong",
+			"message": "pong",
 		})
 	})
 	r.Run(":8088") // listen and server on 0.0.0.0:8080
