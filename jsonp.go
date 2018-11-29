@@ -98,6 +98,10 @@ func newResponseBuffer(w gin.ResponseWriter) *responseBuffer {
 	}
 }
 
+func (w *responseBuffer) Pusher() http.Pusher {
+	return w.Response.Pusher() // use the actual response pusher
+}
+
 func (w *responseBuffer) Header() http.Header {
 	return w.Response.Header() // use the actual response header
 }
